@@ -1,214 +1,77 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
+const data2 = [   // En-têtes
+  ["Bendark", 0, 0],
+  ["Perceval", 0,0],
+  ["Weylax", 0, 0],
+  ["Ace", 0, 0]
+];
+let data3 = [];
+let data = [];
+// Création du tableau
+const table = document.createElement("table");
+console.log(table);
+classement();
 
-  const generateButton = document.querySelector('.btn-generate');
-  const resetButton = document.querySelector('.btn-reset');
-  console.log(111111111111111111);
-  // const response = await fetch('https://cors-anywhere.herokuapp.com/https://proclubs.ea.com/api/fc/members/stats?platform=common-gen5&clubId=5272461', {
-  //   method: 'GET',
-  //   credentials: 'include', // include, *same-origin, omit
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify(data) // body data type must match "Content-Type" header
-  // });
-  // // console.log("aaaaa");
-  // // console.log(response);
-
-  // fetch("https://proclubs.ea.com/api/fc/members/stats?platform=common-gen5&clubId=5272461")
-  // .then(function(response){
-  //  console.log(response);
-  //     return response;
-  // })
-  // .then(function(data){
-  //     console.log(data);
-  // })
-  function solve(){
-    var invocation = new XMLHttpRequest();
-var url = "https://cors-anywhere.herokuapp.com/https://proclubs.ea.com/api/fc/members/stats?platform=common-gen5&clubId=5272461";
-console.log("pppppp");
-function callOtherDomain() {
-  if (invocation) {
-    invocation.open("GET", url, true);
-    invocation.onreadystatechange = handler;
-    invocation.send();
-  }
-  console.log("ppppvvvvvvvvp");
-}
-  }
-solve();
-
-console.log()
-
-  console.log(22221111100000);
-  const joueurs = []; // Utilisez un tableau pour gérer les joueurs dynamiquement
-  for (let i = 1; i <= 11; i++) {
-    joueurs.push(document.querySelector(`#j${i}`));
-  }
-  const roles = []; // De même pour les rôles
-  for (let i = 1; i <= 11; i++) {
-    roles.push(document.querySelector(`#poste-select${i}`));
-  }
-  
-  
-  function setCookie(name, value, days) {
-    let expires = "";
-    if (days) {
-      const date = new Date();
-      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-      expires = "; expires=" + date.toUTCString();
-    }
-    const secure = "; Secure"; // S'assure que le cookie est envoyé sur HTTPS
-    const sameSite = "; SameSite=Strict"; // Empêche le cookie d'être envoyé avec des requêtes cross-site
-    document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + secure + sameSite + "; path=/";
-  }
-  
-
-  function getCookie(name) {
-    let nameEQ = name + "=";
-    let ca = document.cookie.split(';');
-    for(let i=0;i < ca.length;i++) {
-        let c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-    }
-    return '';
-  }
-    
-  function loadPlayersFromCookies() {
-    for (let i = 1; i <= 11; i++) {
-      const playerName = getCookie(`j${i}_name_fifa`);
-      const playerPoste = getCookie(`j${i}_poste_fifa`);
-      if (playerName !== '') {
-        // console.log("J"+i + " Name: "+ playerName + " Poste: "+ playerPoste);
-        document.getElementById(`j${i}`).value = playerName;
-      }
-      if (playerPoste !== '') {
-        document.getElementById(`poste-select${i}`).value = playerPoste;
-      }
-    }
-  }
-
-  function eraseCookie(name) {
-    document.cookie = `${name}=; Max-Age=-99999999;`;
-  }
-
-
-  
-  function removeItemOnce(array, value) {
-    return array.filter(item => item !== value);
-  }
-
-  function reset() {
-    
-    for (let i = 1; i <= 11; i++) {
-        document.getElementById(`j${i}`).value = '';
-        document.getElementById(`poste-select${i}`).value = '';
-
-        // Suppression des cookies
-        setCookie(`j${i}_name_fifa`, '', -1);
-        setCookie(`j${i}_poste_fifa`, '', -1);
-      }
-      // Suppression des postes
-      universalPostes.forEach(poste => {
-          document.getElementById(poste).value = '';
-      });
-}
-  // Ajout des écouteurs d'événements sur les boutons
-  generateButton.addEventListener('click', () => {
-    // Pour simuler un tirage comme au casino on répète la fonction team() 10 fois
-    for (let i = 0; i < 10; i++) {
-      setTimeout(() => team(), i * 100);
-    }
+data.unshift(["Classement","Joueur","TOP","FLOP"]);
+afficherTableau();
+// Fonction pour afficher les données
+function afficherTableau() {
+  console.log("tableau");
+  table.innerHTML = ""; // On vide le tableau avant de le recréer
+  console.log("tableau2");
+  data.forEach((row, index) => {
+    const tr = document.createElement("tr");
+    row.forEach(cell => {
+      const cellElement = index === 0 ? document.createElement("th") : document.createElement("td");
+      cellElement.textContent = cell;
+      tr.appendChild(cellElement);
+    });
+    console.log("tableau3");
+    table.appendChild(tr);
   });
+  const b = document.getElementById("tab");
+  b.appendChild(table);
+}
+// Fonction pour ajouter une ligne
+function ajouterLigne() {
+  const nom = document.getElementById("nom").value;
+  const matiere = document.getElementById("matiere").value;
+  const note = document.getElementById("note").value;
 
-  resetButton.addEventListener('click', () => {
-    console.log("Reset");
-    reset();
-  });
-  // Utilisation du cookie player pour récupérer les joueurs
-  loadPlayersFromCookies();
-
-
-  function doublon(array, array2) {
-    let statut = "ok";
-    let indexError = 0;
-    let arrayIndex = 0;
-     array.forEach((item, index) => { // Vérification des doublons dans les tableaux
-        if (array.indexOf(item) !== index) {
-            // console.log("Index: "+ index + " Item: "+ item);
-            statut = "ko";
-            indexError = index+1;
-            arrayIndex = 1;
-            return statut;
-        }
-        });
-        console.log("Array2: "+ array2);
-    array2.forEach((item, index) => {
-        if (array2.indexOf(item) !== index && array2[index] !== '') { 
-            // console.log("Index: "+ index + " Item: "+ item);
-            statut = "ko";
-            indexError = index+1;
-            if (arrayIndex === 0) {
-                arrayIndex = 2;
-            } else {
-                arrayIndex = 3;
-            }
-            return statut;
-        }
-    }
-    );
-        
-    // Appel de la fonction erreur avec le statut et les tableaux concernés et son index si besoin
-    if (statut === "ko") {
-        erreur(statut, arrayIndex, indexError);
+  if (nom && matiere && note) {
+    data.push([nom, matiere, note]);
+    afficherTableau(); // on réaffiche le tableau
+    // vider les champs
+    document.getElementById("nom").value = "";
+    document.getElementById("matiere").value = "";
+    document.getElementById("note").value = "";
+  } else {
+    alert("Veuillez remplir tous les champs !");
+  }
+}
+//Construction Classement
+function classement() {
+  for (let aa = 0; aa < data2.length; aa++) {
+          const placerole = data2[aa];
+          const nom = placerole[0]
+          const total = placerole[1]-placerole[2]
+          const final = [nom,total];
+          data3.push(final);
+  }
+  data3.sort(function (a, b) {
+    if (a[0] > b[0]) {
+      return -1;
     } else {
-        good();
-    }
-    return statut;
-  }
-
-
-function erreur(statut, arrayIndex, indexError) {
-    if (statut === "ko") {
-        if (arrayIndex === 1) {
-            console.log("Double de joueur");
-            document.getElementById(`j${indexError}`).classList.add('error');
-        } else if (arrayIndex === 2) {
-            console.log("Double de poste");
-            document.getElementById(`poste-select${indexError}`).classList.add('error');
-        } else {
-            console.log("Double de joueur et de poste");
-            document.getElementById(`j${indexError}`).classList.add('error');
-            document.getElementById(`poste-select${indexError}`).classList.add('error');
-        }
+      return 1;
+    };
+   });
+  data3.sort((a, b) => (a[1] < b[1] ? 1 : -1));
+  console.log(data3);
+  for (let k = 0; k < data3.length; k++) {
+    for (let j = 0; j < data2.length; j++) {
+      if (data3[k][0] === data2[j][0])
+      data.push([k+1,data2[j][0],data2[j][1],data2[j][2]])
+      }
     }
 }
-function good(){
-    // Suppression de la classe error si elle existe
-    for (let i = 1; i <= 11; i++) {
-        document.getElementById(`j${i}`).classList.remove('error');
-        document.getElementById(`poste-select${i}`).classList.remove('error');
-    }
-}
-
-function nameDisplayCheck() {
-  // vérifie si l'élément 'name' est stocké dans le web storage
-  if (localStorage.getItem("top1")) {
-    // Si c'est le cas, affiche un accueil personnalisé
-    const name = localStorage.getItem("top1");
-    document.getElementById("top").value = name
-  } else {
-    // Sinon, affiche un accueil générique
-    document.getElementById("top").value = ""
-  }
-  if (localStorage.getItem("flop1")) {
-    // Si c'est le cas, affiche un accueil personnalisé
-    const name2 = localStorage.getItem("flop1");
-    document.getElementById("flop").value = name2
-  } else {
-    // Sinon, affiche un accueil générique
-    document.getElementById("flop").value = ""
-  }
-}
-
 });

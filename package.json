@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "axios": "^1.7.5",
+    "cors": "^2.8.5",
+    "mongodb": "6.8"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "percecorp-main",
+  "description": "C'est un dépôt crée pour Perce (twitch.tv/seigneurpercevai) et par Bendark.",
+  "version": "1.0.0",
+  "main": "fifa.js",
+  "author": "",
+  "license": "ISC",
+  "keywords": []
+}
