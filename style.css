@@ -17,7 +17,10 @@ background-size: cover;
     background-image: url(image/rift.jpg);
     background-size: cover;
 }
-
+#bodyRoulette{
+    background-image: url(image/rift.jpg);
+    background-size: cover;
+}
 #bodystast{
     background-image: url(image/LDC2.jpg);
     background-size: cover;
@@ -383,4 +386,3 @@ table {
     font-weight: bold;
     margin-bottom: 10px;
   }
-
