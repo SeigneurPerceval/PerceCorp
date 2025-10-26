@@ -6,141 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PERCE CORP</title>
     <link rel="stylesheet" href="style.css">
-    <script src="lol.js"></script>
+    <link rel="stylesheet" href="style roulette.css">
+    <script type="module" src="roulette.js"></script>
+</script>
 </head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎯 SNR Roulette</title>
-<style>
-  /* ==== Navbar ==== */
-
-  /* ==== Corps de page ==== */
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background: radial-gradient(circle at center, #0a0a18, #000);
-    color: #f0e6d2;
-    font-family: 'Cinzel', serif;
-  }
-
-  body {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* commencer sous la navbar */
-    background-image: url(image/rift.jpg);
-    background-size: cover;
-  }
-   .roulette {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* commencer sous la navbar */
-    padding-top: 150px; /* espace pour navbar */
-    text-align: center;
-  }
-
-  h1 {
-    color: #7b6ec8;
-    font-size: 3em;
-    margin-bottom: 20px;
-  }
-
-  #inputsArea {
-    margin-bottom: 20px;
-    text-align: center;
-  }
-
-  .input-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  input {
-    padding: 8px;
-    border-radius: 6px;
-    border: 2px solid #c8aa6e;
-    background: #1e1e2a;
-    color: #f0e6d2;
-    width: 150px;
-    text-align: center;
-    font-family: 'Cinzel', serif;
-  }
-
-  button {
-    padding: 10px 15px;
-    border: 2px solid #c8aa6e;
-    border-radius: 10px;
-    margin: 5px;
-    background: linear-gradient(45deg, #1a2634, #102030);
-    color: #f0e6d2;
-    font-family: 'Cinzel', serif;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 0 15px rgba(200,170,110,0.3);
-  }
-
-  button:hover {
-    background: linear-gradient(45deg, #c8aa6e, #785a28);
-    color: black;
-    transform: scale(1.1);
-  }
-
-  #wheelContainer {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 20px;
-  }
-
-  #wheel {
-    border-radius: 50%;
-    border: 8px solid #c8aa6e;
-    box-shadow: 0 0 30px #c8aa6e, inset 0 0 100px #1a2634;
-    transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
-  }
-
-  /* Flèche fine inversée en haut du cercle */
-  #pointer {
-    position: absolute;
-    top: 3px;
-    left: 50%;
-    transform: translateX(-50%) rotate(180deg);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 35px solid #c8aa6e;
-    filter: drop-shadow(0 0 10px #c8aa6e);
-    z-index: 8;
-  }
-
-  #winner {
-    font-weight: bold;
-    font-size: 1.3em;
-    color: #f0e6d2;
-    text-shadow: 0 0 15px #c8aa6e;
-    margin-top: 10px;
-  }
-
-  select {
-    padding: 6px;
-    border-radius: 6px;
-    background: #1a2634;
-    color: #f0e6d2;
-    border: 2px solid #c8aa6e;
-    font-family: 'Cinzel', serif;
-  }
-
-  .controls {
-    text-align: center;
-  }
-</style>
 </head>
 <body>
-
 <!-- ==== Navbar ==== -->
 <nav class="navbar">
     <a href="index.html" class="logo">
@@ -156,204 +30,25 @@
         </ul>
     </div>
 </nav>
-<div class = "roulette">
-<h1>⚔️ SNR Roulette ⚔️</h1>
+<div class="roulette">
+  <h1>⚔️ SNR Roulette ⚔️</h1>
+  <div id="inputsArea">
+    <div class="input-container" id="inputs"></div>
+    <button id="addBtn">➕ Ajouter un participant</button>
+  </div>
+  <div id="wheelContainer">
+    <div id="pointer"></div>
+    <canvas id="wheel" width="500" height="500"></canvas>
+  </div>
 
-<div id="inputsArea">
-  <div class="input-container" id="inputs"></div>
-  <button id="addBtn">➕ Ajouter un participant</button>
+  <div class="controls">
+    <button id="spinBtn">Lancer</button>
+    <button id="relaunchBtn">Relancer sans gagnant</button><br>
+    <select id="boostSelect"></select>
+    <button id="boostBtn">Chance +</button>
+    <button id="reduceBtn">Chance -</button>
+  </div>
+  <p id="winner"></p>
 </div>
-
-<div id="wheelContainer">
-  <div id="pointer"></div>
-  <canvas id="wheel" width="500" height="500"></canvas>
-</div>
-
-<div class="controls">
-  <button id="spinBtn">Lancer</button>
-  <button id="relaunchBtn">Relancer sans gagnant</button>
-  <br>
-  <select id="boostSelect"></select>
-  <button id="boostBtn">Chance +</button>
-</div>
-
-<p id="winner"></p>
-</div>
-<script>
-const canvas = document.getElementById("wheel");
-const ctx = canvas.getContext("2d");
-const inputsContainer = document.getElementById("inputs");
-const boostSelect = document.getElementById("boostSelect");
-let participants = [];
-let winner = null;
-let currentRotation = 0;
-
-// Ajouter un champ
-function addInput(value = "") {
-  const input = document.createElement("input");
-  input.placeholder = "Participant " + (inputsContainer.children.length + 1);
-  input.value = value;
-  input.addEventListener("input", updateParticipants);
-  inputsContainer.appendChild(input);
-  updateParticipants();
-}
-document.getElementById("addBtn").addEventListener("click", () => addInput());
-
-// Mettre à jour la liste
-function updateParticipants() {
-  participants = Array.from(inputsContainer.querySelectorAll("input"))
-    .map(el => el.value.trim())
-    .filter(v => v)
-    .map(name => ({ name, removed: false, weight: 1 }));
-  refreshBoostList();
-  drawWheel();
-}
-
-// Rafraîchir le sélecteur de boost
-function refreshBoostList() {
-  boostSelect.innerHTML = "";
-  participants.filter(p => !p.removed).forEach(p => {
-    const opt = document.createElement("option");
-    opt.textContent = p.name;
-    boostSelect.appendChild(opt);
-  });
-}
-
-// Dessiner la roulette
-function drawWheel() {
-  const active = participants.filter(p => !p.removed);
-  const radius = canvas.width / 2;
-  const totalWeight = active.reduce((sum, p) => sum + p.weight, 0);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  let startAngle = 0;
-  for (let i = 0; i < active.length; i++) {
-    const slice = 2 * Math.PI * (active[i].weight / totalWeight);
-    const endAngle = startAngle + slice;
-    const gradient = ctx.createRadialGradient(radius, radius, 50, radius, radius, radius);
-    gradient.addColorStop(0, `hsl(${i * 360 / active.length}, 60%, 55%)`);
-    gradient.addColorStop(1, `hsl(${i * 360 / active.length}, 80%, 35%)`);
-    ctx.beginPath();
-    ctx.moveTo(radius, radius);
-    ctx.arc(radius, radius, radius, startAngle, endAngle);
-    ctx.closePath();
-    ctx.fillStyle = gradient;
-    ctx.fill();
-
-    ctx.save();
-    ctx.translate(radius, radius);
-    ctx.rotate(startAngle + slice / 2);
-    ctx.textAlign = "right";
-    ctx.fillStyle = "#f0e6d2";
-    ctx.font = "bold 20px Cinzel";
-    ctx.fillText(active[i].name, radius - 10, 5);
-    ctx.restore();
-
-    startAngle = endAngle;
-  }
-}
-
-// Spin
-function spin(isPreSpin = false) {
-  const active = participants.filter(p => !p.removed);
-  if (active.length === 0) return alert("Aucun participant !");
-
-  const totalWeight = active.reduce((sum, p) => sum + p.weight, 0);
-
-  // Tirage du gagnant selon les poids
-  let rand = Math.random() * totalWeight;
-  let chosen;
-  let chosenIndex;
-  for (let i = 0; i < active.length; i++) {
-    rand -= active[i].weight;
-    if (rand <= 0) {
-      chosen = active[i];
-      chosenIndex = i;
-      break;
-    }
-  }
-console.log(chosen);
-  // Calcul des angles de chaque tranche
-  const sliceAngles = active.map(p => (p.weight / totalWeight) * 360);
-
-  console.log(sliceAngles);
-
-  // Calcul de l'angle pour que le gagnant soit en haut
-  let targetAngle = 0;
-  for (let i = 0; i < chosenIndex; i++) {
-    targetAngle += sliceAngles[i];
-  }
-  targetAngle += sliceAngles[chosenIndex] / 2; // centre de la tranche
-console.log(chosen);
-  // Rotation totale : tours complets + alignement du gagnant en haut
-  const randomSpins = 360 * 5 + Math.random() * 360 * 3;
-  currentRotation += randomSpins + (360 - targetAngle % 360);
-
-  // Appliquer la rotation avec transition CSS
-  canvas.style.transition = "transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)";
-  canvas.style.transform = `rotate(${currentRotation}deg)`;
-
-  setTimeout(() => {
-    if (isPreSpin && Math.random() <= 0.1) {
-      spin(true); // relance sans afficher le gagnant
-    } else {
-      winner = chosen;
-      document.getElementById("winner").textContent = `🏆 Gagnant : ${winner.name}`;
-      // highlightWinner(winner.name); // si tu veux réactiver le glow
-    }
-  }, 5000); // temps de l'animation
-}
-
-// Highlight gagnant
-//function highlightWinner(name) {
-//  const active = participants.filter(p => !p.removed);
-  //const index = active.findIndex(p => p.name === name);
-  //if (index === -1) return;
-  //const glow = document.createElement("div");
-  //glow.style.position = "absolute";
-  //glow.style.top = "50%";
-  //glow.style.left = "50%";
-  //glow.style.width = "420px";
-  //glow.style.height = "420px";
-  //glow.style.borderRadius = "50%";
-  //glow.style.transform = "translate(-50%, -50%)";
-  //glow.style.boxShadow = "0 0 60px 30px rgba(200,170,110,0.7)";
-  //glow.style.pointerEvents = "none";
-  //document.body.appendChild(glow);
-  //setTimeout(() => document.body.removeChild(glow), 1500);
-//}
-
-// Relancer sans gagnant
-function relaunchWithoutWinner() {
-  if (!winner) return alert("Lancez d'abord la roulette !");
-  const target = participants.find(p => p.name === winner.name);
-  if (target) target.removed = true;
-  winner = null;
-  drawWheel();
-  refreshBoostList();
-  setTimeout(() => {
-    spin(true);
-}, 500);
-  
-}
-
-// Boost
-function boostParticipant() {
-  const name = boostSelect.value;
-  const p = participants.find(p => p.name === name);
-  if (p) {
-    p.weight += 1;
-    drawWheel();
-  }
-}
-
-// Événements
-document.getElementById("spinBtn").addEventListener("click", () => spin(true));
-document.getElementById("relaunchBtn").addEventListener("click", relaunchWithoutWinner);
-document.getElementById("boostBtn").addEventListener("click", boostParticipant);
-
-// Initialisation
-for (let i = 1; i <= 5; i++) addInput("");
-</script>
-
 </body>
 </html>

@@ -1,193 +1,3 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎯 SNR Roulette FX</title>
-
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background: radial-gradient(circle at center, #0a0a18, #000);
-    color: #f0e6d2;
-    font-family: 'Cinzel', serif;
-  }
-
-  body {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    background-image: url(image/rift.jpg);
-    background-size: cover;
-    transition: background-color 0.2s;
-  }
-
-  .roulette {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding-top: 150px;
-    text-align: center;
-  }
-
-  h1 {
-    color: #7b6ec8;
-    font-size: 3em;
-    margin-bottom: 20px;
-  }
-
-  #inputsArea {
-    margin-bottom: 20px;
-    text-align: center;
-  }
-
-  .input-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  input {
-    padding: 8px;
-    border-radius: 6px;
-    border: 2px solid #c8aa6e;
-    background: #1e1e2a;
-    color: #f0e6d2;
-    width: 150px;
-    text-align: center;
-    font-family: 'Cinzel', serif;
-  }
-
-  button {
-    padding: 10px 15px;
-    border: 2px solid #c8aa6e;
-    border-radius: 10px;
-    margin: 5px;
-    background: linear-gradient(45deg, #1a2634, #102030);
-    color: #f0e6d2;
-    font-family: 'Cinzel', serif;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 0 15px rgba(200,170,110,0.3);
-  }
-
-  button:hover {
-    background: linear-gradient(45deg, #c8aa6e, #785a28);
-    color: black;
-    transform: scale(1.1);
-  }
-
-  #wheelContainer {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 20px;
-  }
-
-  #wheel {
-    border-radius: 50%;
-    border: 8px solid #c8aa6e;
-    box-shadow: 0 0 30px #c8aa6e, inset 0 0 100px #1a2634;
-    transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
-  }
-
-  /* 🔥 Effet glow quand la roue tourne */
-  @keyframes glow {
-    0%, 100% { box-shadow: 0 0 25px #c8aa6e, inset 0 0 100px #1a2634; }
-    50% { box-shadow: 0 0 50px #fff, inset 0 0 120px #c8aa6e; }
-  }
-
-  #wheel.spinning {
-    animation: glow 1s infinite;
-  }
-
-  #pointer {
-    position: absolute;
-    top: 3px;
-    left: 50%;
-    transform: translateX(-50%) rotate(180deg);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 35px solid #c8aa6e;
-    filter: drop-shadow(0 0 10px #c8aa6e);
-    z-index: 8;
-  }
-
-  /* 🌟 Nom du gagnant caché par défaut */
-  #winner {
-    margin-top: 40px;
-    font-size: 4em;
-    font-weight: 900;
-    color: #ffd700;
-    text-shadow:
-      0 0 10px #ffea80,
-      0 0 20px #ffc700,
-      0 0 40px #ffae00,
-      0 0 80px #ff9100;
-    animation: winnerPop 1s ease-out, winnerPulse 1.5s infinite alternate;
-    display: none; /* 👈 Caché jusqu’à la fin du spin */
-  }
-
-  @keyframes winnerPop {
-    0% { transform: scale(0); opacity: 0; text-shadow: none; }
-    60% { transform: scale(1.3); opacity: 1; }
-    100% { transform: scale(1); }
-  }
-
-  @keyframes winnerPulse {
-    0% { text-shadow: 0 0 15px #ffae00, 0 0 40px #ff8000; }
-    100% { text-shadow: 0 0 30px #fff8c0, 0 0 80px #ffe066; }
-  }
-
-  select {
-    padding: 6px;
-    border-radius: 6px;
-    background: #1a2634;
-    color: #f0e6d2;
-    border: 2px solid #c8aa6e;
-    font-family: 'Cinzel', serif;
-  }
-
-  .controls {
-    text-align: center;
-  }
-</style>
-</head>
-<body>
-
-<div class="roulette">
-  <h1>⚔️ SNR Roulette FX ⚔️</h1>
-
-  <div id="inputsArea">
-    <div class="input-container" id="inputs"></div>
-    <button id="addBtn">➕ Ajouter un participant</button>
-  </div>
-
-  <div id="wheelContainer">
-    <div id="pointer"></div>
-    <canvas id="wheel" width="500" height="500"></canvas>
-  </div>
-
-  <div class="controls">
-    <button id="spinBtn">Lancer</button>
-    <button id="relaunchBtn">Relancer sans gagnant</button><br>
-    <select id="boostSelect"></select>
-    <button id="boostBtn">Chance +</button>
-    <button id="reduceBtn">Chance -</button>
-  </div>
-
-  <p id="winner"></p>
-</div>
-
-<!-- 🎉 Librairie de confettis -->
-<script type="module">
 import confetti from 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.module.mjs';
 
 const canvas = document.getElementById("wheel");
@@ -198,7 +8,7 @@ let participants = [];
 let winner = null;
 let oldTargetAngle = 0;
 let totalRotation = 0;
-let Tour =  1;
+
 // Ajouter un champ
 function addInput(value = "") {
   const input = document.createElement("input");
@@ -238,6 +48,7 @@ function drawWheel() {
 
   const startOffset = -Math.PI / 2;
   let startAngle = startOffset;
+  let Tour =  1;
 
   for (let i = 0; i < active.length; i++) {
     const slice = 2 * Math.PI * (active[i].weight / totalWeight);
@@ -298,11 +109,9 @@ function spin(isPreSpin = false) {
   totalRotation = totalRotation + oldTargetAngle + randomSpins + (360 - targetAngle);
   canvas.style.transform = `rotate(${totalRotation}deg)`;
   oldTargetAngle = targetAngle;
-  
-  console.log(Tour);
 
   setTimeout(() => {
-    if (isPreSpin && Math.random() <= 0.7) {
+    if (isPreSpin && Math.random() <= 0.1) {
       // on affiche le nombre de tour si on tombe dans le pourcentage de relance
       Tour += 1;
       winnerEl.innerHTML = `🎯 ${Tour}ᵉ tour 🎯`;
@@ -376,6 +185,3 @@ document.getElementById("boostBtn").addEventListener("click", boostParticipant);
 document.getElementById("reduceBtn").addEventListener("click", reduceChance);
 
 for (let i = 1; i <= 5; i++) addInput("");
-</script>
-</body>
-</html>
