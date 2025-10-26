@@ -8,6 +8,7 @@ let participants = [];
 let winner = null;
 let oldTargetAngle = 0;
 let totalRotation = 0;
+let Tour =  1;
 
 // Ajouter un champ
 function addInput(value = "") {
@@ -48,7 +49,7 @@ function drawWheel() {
 
   const startOffset = -Math.PI / 2;
   let startAngle = startOffset;
-  let Tour =  1;
+
 
   for (let i = 0; i < active.length; i++) {
     const slice = 2 * Math.PI * (active[i].weight / totalWeight);
@@ -131,6 +132,7 @@ function spin(isPreSpin = false) {
       winnerEl.innerHTML = `🏆 ${winner.name.toUpperCase()} 🏆`;
       winnerEl.style.display = "block";
       winnerEl.style.animation = "winnerPop 1s ease-out, winnerPulse 1.5s infinite alternate";
+      console.log(Tour);
       Tour = 1;
       // 🎊 Confettis
       confetti({ particleCount: 300, spread: 120, origin: { y: 0.6 } });
