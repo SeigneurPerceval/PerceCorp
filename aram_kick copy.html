@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PERCE CORP</title>
+</script>
+</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 SNR Roulette</title>
+</head>
+<style>
+*{
+
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    list-style: none;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Cinzel', serif;
+  background: radial-gradient(circle at center, #0a0a18, #000);
+  color: #f0e6d2;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-image: url(image/rift.jpg);
+  background-size: cover;
+}
+
+h1 { text-align: center; color: #7b6ec8; font-size: 3.2em; margin: 30px auto; }
+h2 { text-align: center; color: #c8aa6e; font-size: 1.4em; }
+
+.main-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  padding: 20px;
+  flex: 1;
+}
+
+/* === Colonne gauche === */
+#left-column {
+  background: rgba(20,20,35,0.8);
+  border: 2px solid #c8aa6e;
+  border-radius: 15px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 2px solid #c8aa6e;
+  background: #1e1e2a;
+  color: #f0e6d2;
+  width: 90%;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+}
+
+button {
+  padding: 10px 15px;
+  border: 2px solid #c8aa6e;
+  border-radius: 10px;
+  margin: 5px;
+  background: linear-gradient(45deg,#1a2634,#102030);
+  color: #f0e6d2;
+  font-family: 'Cinzel', serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+button:hover {
+  background: linear-gradient(45deg,#c8aa6e,#785a28);
+  color: black;
+  transform: scale(1.1);
+}
+
+/* === Colonne centrale === */
+#center-column { text-align:center; }
+
+#wheelContainer {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+#wheel {
+  border-radius: 50%;
+  border: 8px solid #c8aa6e;
+  box-shadow: 0 0 0px #c8aa6e, inset 0 0 100px #1a2634;
+  transition: transform 5s cubic-bezier(0.33,1,0.68,1);
+}
+
+#wheel.spinning { animation: glow 1s infinite; }
+@keyframes glow { 0%,100% { box-shadow:0 0 25px #c8aa6e, inset 0 0 100px #1a2634;}50%{box-shadow:0 0 50px #fff, inset 0 0 120px #c8aa6e;} }
+
+#pointer {
+  position:absolute;
+  top:3px;
+  left:50%;
+  transform: translateX(-50%) rotate(180deg);
+  width:0;height:0;
+  border-left:8px solid transparent;
+  border-right:8px solid transparent;
+  border-bottom:35px solid #c8aa6e;
+  z-index:8;
+}
+
+#winner {
+  margin-top:20px;
+  font-size:2.4em;
+  font-weight:900;
+  color:#ffd700;
+  text-shadow:0 0 15px #ffae00,0 0 40px #ff8000;
+  display:none;
+}
+
+.controls { text-align:center; margin-bottom:10px; }
+
+select {
+  padding:8px;
+  border-radius:6px;
+  background:#1a2634;
+  color:#f0e6d2;
+  border:2px solid #c8aa6e;
+  font-family:'Cinzel', serif;
+}
+
+/* === Colonne droite === */
+#right-column {
+  background: rgba(20,20,35,0.8);
+  border: 2px solid #c8aa6e;
+  border-radius: 15px;
+  padding:15px;
+  text-align: center;
+}
+
+.players-header {
+  display:grid;
+  grid-template-columns: 60% 25% 15%;
+  font-weight:bold;
+  color:#c8aa6e;
+  padding-bottom:5px;
+  border-bottom:1px solid rgba(200,170,110,0.5);
+  text-align:center;
+  font-size:1.1em;
+}
+
+.player {
+  display:grid;
+  grid-template-columns:60% 25% 15%;
+  align-items:center;
+  margin:8px 0;
+  padding:8px;
+  background: rgba(40,40,60,0.6);
+  border-radius:8px;
+}
+
+.player-name {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-right:10px;
+}
+
+.player-controls button { padding:4px 9px; margin:0 2px; font-size:0.9em; }
+.player input[type="checkbox"] { transform: scale(1.4); margin:auto; }
+
+#ranking {
+  margin-top:15px;
+  padding-top:10px;
+  border-top:2px solid #c8aa6e;
+}
+
+#ranking h3 { text-align:center; color:#c8aa6e; font-size:1.3em; margin-bottom:10px;}
+.ranking-item { display:flex; justify-content:space-between; padding:6px 10px; border-bottom:1px solid rgba(200,170,110,0.3);}
+
+/* === Popup classement général === */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal.show {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-content {
+  background: rgba(20,20,35,0.95);
+  border: 2px solid #c8aa6e;
+  border-radius: 15px;
+  padding: 20px;
+  width: 110%;
+  max-width: 1000px;
+  color: #f0e6d2;
+  max-height: 100vh;
+  overflow-y: auto;
+  text-align: center;
+  box-shadow: 0 0 30px #c8aa6e;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  font-size: 2em;
+  color: #c8aa6e;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.close:hover { 
+  color: #ffd700;
+  transform: scale(1.2);
+}
+
+/* === Animation apparition classement === */
+.modal-content table {
+  width: 100%;
+  border-collapse: collapse;
+  opacity: 0;
+  transform: scale(0.95);
+  animation: fadeInTable 0.8s forwards ease-out;
+}
+@keyframes fadeInTable { to { opacity:1; transform:scale(1);} }
+
+.modal-content table tbody tr {
+  opacity: 0;
+  transform: translateY(15px);
+  animation: fadeInRow 0.6s forwards ease-out;
+}
+@keyframes fadeInRow { to { opacity:1; transform:translateY(0);} }
+
+.modal-content table tbody tr:nth-child(n) {
+  animation-delay: calc(0.1s * var(--i));
+}
+
+.modal-content table tbody tr:nth-child(-n+3) td {
+  color: #ffd700;
+  text-shadow: 0 0 8px #ffae00, 0 0 15px #c8aa6e;
+  font-weight: bold;
+}
+.modal-content table tbody tr:hover {
+  background: rgba(200, 170, 110, 0.15);
+  transform: scale(1.02);
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+h1 {
+  text-align: center;
+  color: #7b6ec8;
+  font-size: 3.2em;
+  margin: 150px auto 0px auto; /* 👈 ajoute de l’espace au-dessus */
+}
+.navbar{
+    position: absolute;
+    padding-top: 2%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    box-sizing: border-box;
+    background: 0;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.navbar .logo{
+font-size: 1em;
+font-weight: bold;
+width: 25%;
+}
+
+.navbar .nav-links ul {
+    display: flex;
+}
+.navbar .nav-links ul li{
+    margin: 0 25px;
+}
+
+.navbar .nav-links ul li.active a{
+    color: rgb(214, 214, 214);
+    font-weight: bold;
+    background-color: rgb(33, 33, 33);
+    padding:5px;
+    border-radius: 10px;
+}
+.navbar .menu-hamburger {
+    position: absolute;
+    display: none;
+    top: 50px;
+    right: 50px;
+    width: 35px;
+    }
+span{
+      text-align: center;
+
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+    <a href="index.html" class="logo">
+        <img src="image/PPPerce.png" class="logo">
+    </a>
+    <div class="nav-links">
+        <ul>
+            <li class="active"><a href="fifa.html">CLUB TIRAGE</a></li>
+            <li class="active"><a href="stats.html">CLUB STATS</a></li>
+            <li class="active"><a href="equipe_lol.html">EQUIPES LOL</a></li>
+            <li class="active"><a href = "roulette.html">ROULETTE</a></li>
+            <li class="active"><a href = "aram_kick copy.html">ARAM KICK</a></li>
+        </ul>
+    </div>
+</nav>
+<div>
+<h1>⚔️ SNR ARAM KICK⚔️</h1>
+</div>
+<div class="main-container">
+  <!-- Gauche -->
+  <div id="left-column">
+    <h2>Participants</h2>
+    <div class="input-container" id="inputs"></div>
+    <button id="addBtn">➕ Ajouter un participant</button>
+
+    <h2>Classement Général Aram Kick</h2>
+    <button id="showRankingBtn">📊 Voir le classement complet</button>
+
+    <div id="rankingModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="modalRankingContent"><p>Chargement...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Centre -->
+  <div id="center-column">
+    <div id="wheelContainer">
+      <div id="pointer"></div>
+      <canvas id="wheel" width="600" height="600"></canvas>
+    </div>
+    <div class="controls">
+      <button id="spinBtn">Lancer</button>
+      <button id="relaunchBtn">Relancer sans gagnant</button><br>
+      <select id="boostSelect"></select>
+      <button id="boostBtn">Chance +</button>
+      <button id="reduceBtn">Chance -</button><br>
+      <button id="resetBtn">🔄 RESET TOTAL</button>
+    </div>
+    <p id="winner"></p>
+  </div>
+
+  <!-- Droite -->
+  <div id="right-column">
+    <h2>Joueurs</h2>
+    <div class="players-header">
+      <span>Joueur</span>
+      <span>Points</span>
+      <span>Perdant</span>
+    </div>
+    <div id="playersList"></div>
+
+    <button id="validateBtn">✅ Valider les points</button>
+
+    <div id="ranking">
+      <h3>Classement</h3>
+      <div id="rankingList"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import confetti from 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.module.mjs';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { SUPABASE_URL, SUPABASE_KEY } from './config.js';
+
+
+// === Supabase ===
+//const supabaseUrl = 'https://rjulzaummbtlvxfvctta.supabase.co';
+//const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqdWx6YXVtbWJ0bHZ4ZnZjdHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxMDE1NDcsImV4cCI6MjA3NzY3NzU0N30.gYTET1uowRNlLIsTd-yp_r-DIJZI_MSYcvJymngKS2g';
+const supabaseUrl = SUPABASE_URL;
+const supabaseAnonKey = SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+async function getUsers() {
+  const { data, error } = await supabase.from('users').select('*');
+  if (error) console.error(error);
+  else console.log(data);
+}
+
+getUsers();
+
+// === DOM ===
+const canvas=document.getElementById("wheel");
+const ctx=canvas.getContext("2d");
+const inputsContainer=document.getElementById("inputs");
+const boostSelect=document.getElementById("boostSelect");
+const playersList=document.getElementById("playersList");
+const rankingList=document.getElementById("rankingList");
+const winnerEl=document.getElementById("winner");
+const validateBtn=document.getElementById("validateBtn");
+const resetBtn=document.getElementById("resetBtn");
+
+const rankingModal = document.getElementById("rankingModal");
+const modalContent = document.getElementById("modalRankingContent");
+const showRankingBtn = document.getElementById("showRankingBtn");
+const spanClose = rankingModal.querySelector(".close");
+
+let participants=[];
+let players=Array(4).fill(null).map(()=>({name:"", points:0, replace:false}));
+let ranking=[];
+let winner=null;
+let oldTargetAngle=0;
+let totalRotation=0;
+let Tour =  1;
+
+// === LOCALSTORAGE ===
+function saveData() { localStorage.setItem("rouletteData", JSON.stringify({participants, players, ranking})); }
+function loadData() {
+  const data=JSON.parse(localStorage.getItem("rouletteData")||"null");
+  if(data){
+    participants=data.participants||[];
+    players=data.players||Array(4).fill(null).map(()=>({name:"", points:0, replace:false}));
+    ranking=data.ranking||[];
+  }
+}
+loadData();
+
+// === Participants ===
+function addInput(value=""){
+  const input=document.createElement("input");
+  input.placeholder="Participant "+(inputsContainer.children.length+1);
+  input.value=value;
+  input.addEventListener("input", updateParticipants);
+  inputsContainer.appendChild(input);
+  updateParticipants();
+}
+function updateParticipants(){
+  participants=Array.from(inputsContainer.querySelectorAll("input"))
+    .map(el=>el.value.trim())
+    .filter(v=>v)
+    .map(name=>({name, removed:false, weight:1}));
+  refreshBoostList();
+  drawWheel();
+  saveData();
+}
+function removeParticipant(name){
+  participants=participants.filter(p=>p.name!==name);
+  Array.from(inputsContainer.querySelectorAll("input")).forEach(inp=>{
+    if(inp.value===name) inp.remove();
+  });
+  updateParticipants();
+}
+function refreshBoostList(){
+  boostSelect.innerHTML="";
+  participants.forEach(p=>{
+    const opt=document.createElement("option");
+    opt.textContent=p.name;
+    boostSelect.appendChild(opt);
+  });
+}
+
+// === Joueurs ===
+function renderPlayers(){
+  playersList.innerHTML="";
+  players.forEach((player,i)=>{
+    const div=document.createElement("div");
+    div.className="player";
+    div.innerHTML=`
+      <div class="player-name">
+        <span>${player.name||"— Vide —"}</span>
+        <div class="player-controls">
+          <button onclick="window.addPoints(${i},1)">+</button>
+          <button onclick="window.addPoints(${i},-1)">−</button>
+        </div>
+      </div>
+      <span>${player.points}</span>
+      <input type="checkbox" ${player.replace?"checked":""} onchange="window.toggleReplace(${i})">
+    `;
+    playersList.appendChild(div);
+  });
+  saveData();
+}
+window.addPoints=function(i,delta){players[i].points=Math.max(0,players[i].points+delta); renderPlayers();}
+window.toggleReplace=function(i){players[i].replace=!players[i].replace; saveData();}
+
+// === Classement local ===
+function renderRanking(){
+  rankingList.innerHTML="";
+  ranking.forEach(r=>{
+    const div=document.createElement("div");
+    div.className="ranking-item";
+    div.innerHTML=`<span>${r.name}</span><span>${r.points}</span>`;
+    rankingList.appendChild(div);
+  });
+  saveData();
+}
+
+// === Validation des points ===
+validateBtn.addEventListener("click",async ()=>{
+  players.forEach((p,i)=>{
+    if(!p.name) return;
+    let r=ranking.find(r=>r.name===p.name);
+    if(r) r.points+=p.points;
+    else ranking.push({name:p.name, points:p.points});
+    p.points=0;
+    if(p.replace){
+      players[i]={name:"", points:0, replace:false};
+    }
+  });
+  renderPlayers();
+  renderRanking();
+});
+
+// === Roulette ===
+function drawWheel(){
+  const active=participants;
+  const radius=canvas.width/2;
+  const totalWeight=active.reduce((sum,p)=>sum+p.weight,0);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  let startAngle=-Math.PI/2;
+  active.forEach((p,i)=>{
+    const slice=2*Math.PI*(p.weight/totalWeight);
+    const endAngle=startAngle+slice;
+    const gradient=ctx.createRadialGradient(radius,radius,50,radius,radius,radius);
+    gradient.addColorStop(0,`hsl(${i*360/active.length},60%,55%)`);
+    gradient.addColorStop(1,`hsl(${i*360/active.length},80%,35%)`);
+    ctx.beginPath();
+    ctx.moveTo(radius,radius);
+    ctx.arc(radius,radius,radius,startAngle,endAngle);
+    ctx.closePath();
+    ctx.fillStyle=gradient;
+    ctx.fill();
+    ctx.save();
+    ctx.translate(radius,radius);
+    ctx.rotate(startAngle+slice/2);
+    ctx.textAlign="right";
+    ctx.fillStyle="#f0e6d2";
+    ctx.font="bold 20px Cinzel";
+    ctx.fillText(p.name,radius-10,5);
+    ctx.restore();
+    startAngle=endAngle;
+  });
+}
+
+function spin(isPreSpin = false) {
+  const active = participants;
+  if (active.length === 0) return alert("Aucun participant !");
+
+  // 🔹 Vérification des places disponibles
+  const emptyIndex = players.findIndex(p => !p.name);
+  const replaceIndex = players.findIndex(p => p.replace);
+  if (emptyIndex === -1 && replaceIndex === -1) {
+    return alert("❌ Pas de place disponible à droite ! Impossible de lancer la roulette.");
+  }
+
+  winnerEl.style.display = "none";
+  canvas.classList.add("spinning");
+
+  const totalWeight = active.reduce((sum, p) => sum + p.weight, 0);
+  let rand = Math.random() * totalWeight;
+  let chosen, chosenIndex;
+  for (let i = 0; i < active.length; i++) {
+    rand -= active[i].weight;
+    if (rand <= 0) { chosen = active[i]; chosenIndex = i; break; }
+  }
+
+  const sliceAngles = active.map(p => (p.weight / totalWeight) * 360);
+  let targetAngle = sliceAngles.slice(0, chosenIndex).reduce((a, b) => a + b, 0);
+  targetAngle += Math.random() * sliceAngles[chosenIndex];
+  const randomSpins = 360 * (Math.floor(Math.random() * 4) + 5);
+  totalRotation += oldTargetAngle + randomSpins + (360 - targetAngle);
+  canvas.style.transform = `rotate(${totalRotation}deg)`;
+  oldTargetAngle = targetAngle;
+
+  setTimeout(() => {
+    if (isPreSpin && Math.random() <= 0.5) {
+      // on affiche le nombre de tour si on tombe dans le pourcentage de relance
+      Tour += 1;
+      winnerEl.innerHTML = `🎯 ${Tour}ᵉ tour 🎯`;
+      winnerEl.style.display = "block";
+      winnerEl.style.animation = "winnerPop 1s ease-out, winnerPulse 1.5s infinite alternate";
+      confetti({ particleCount: 300, spread: 120, origin: { y: 0.6 } });
+      setTimeout(() => {
+        spin(true);
+         }, 4000);
+    } else {
+    canvas.classList.remove("spinning");
+    winner = chosen;
+    winnerEl.textContent = `🏆 ${winner.name} 🏆`;
+    winnerEl.style.display = "block";
+    confetti({ particleCount: 250, spread: 120, origin: { y: 0.6 } });
+    Tour = 1;
+    assignWinner(winner.name);
+    removeParticipant(winner.name);
+    }
+  }, 5000);
+}
+
+function assignWinner(name){
+  const empty=players.findIndex(p=>!p.name);
+  const replaceIndex=players.findIndex(p=>p.replace);
+  let idx=replaceIndex!==-1?replaceIndex:empty;
+  if(idx!==-1) players[idx]={name, points:0, replace:false};
+  let r=ranking.find(r=>r.name===name);
+  if(!r) ranking.push({name, points:0});
+  renderPlayers();
+}
+
+function relaunchWithoutWinner(){
+  if(!winner) return alert("Lancez d'abord la roulette !");
+  winner=null;
+  drawWheel();
+  refreshBoostList();
+  setTimeout(()=>spin(),500);
+}
+
+function boostParticipant(){
+  const p=participants.find(p=>p.name===boostSelect.value);
+  if(p) p.weight++;
+  drawWheel();
+  saveData();
+}
+function reduceParticipant(){
+  const p=participants.find(p=>p.name===boostSelect.value);
+  if(p && p.weight>1) p.weight--;
+  drawWheel();
+  saveData();
+}
+
+// === Supabase Classement Popup ===
+async function fetchRankingModal() {
+  const { data, error } = await supabase
+    .from('aramkick')
+    .select('Pseudo, Victoire')
+    .order('Victoire', { ascending: false });
+
+  if(error) { modalContent.innerHTML = `<p>Erreur : ${error.message}</p>`; return; }
+  if(!data || data.length===0) { modalContent.innerHTML = "<p>Aucun classement disponible.</p>"; return; }
+
+  let html = `<table style="width:100%; text-align:center; border-collapse: collapse;">
+                <thead>
+                  <tr>
+                    <th style="border-bottom:1px solid #c8aa6e;">#</th>
+                    <th style="border-bottom:1px solid #c8aa6e;">Joueur</th>
+                    <th style="border-bottom:1px solid #c8aa6e;">Points</th>
+                  </tr>
+                </thead>
+                <tbody>`;
+  data.forEach((row, index) => {
+    html += `<tr>
+               <td>${index + 1}</td>
+               <td>${row.Pseudo}</td>
+               <td>${row.Victoire}</td>
+             </tr>`;
+  });
+  html += "</tbody></table>";
+  modalContent.innerHTML = html;
+}
+
+showRankingBtn.onclick = async () => {
+  await fetchRankingModal();
+  rankingModal.classList.add("show");
+  rankingModal.style.display = "flex";
+};
+
+
+
+spanClose.onclick = () => {
+  rankingModal.classList.remove("show");
+  setTimeout(()=> rankingModal.style.display = "none", 300);
+};
+window.onclick = (event) => {
+  if(event.target === rankingModal) {
+    rankingModal.classList.remove("show");
+    setTimeout(()=> rankingModal.style.display = "none", 300);
+  }
+};
+
+// === Événements ===
+document.getElementById("spinBtn").onclick=spin;
+document.getElementById("relaunchBtn").onclick=relaunchWithoutWinner;
+document.getElementById("boostBtn").onclick=boostParticipant;
+document.getElementById("reduceBtn").onclick=reduceParticipant;
+document.getElementById("addBtn").onclick=()=>addInput("");
+resetBtn.onclick=()=>{
+  if(confirm("Effacer toutes les données ?")){
+    localStorage.clear();
+    location.reload();
+  }
+};
+
+// === Initialisation ===
+if (!participants || participants.length === 0) {
+  for (let i = 0; i < 5; i++) addInput("");
+} else {
+  inputsContainer.innerHTML = "";
+  participants.forEach(p => addInput(p.name));
+}
+renderPlayers();
+renderRanking();
+drawWheel();
+</script>
+</body>
+</html>

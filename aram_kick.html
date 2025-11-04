@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 SNR Roulette FX</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  background: radial-gradient(circle at center, #0a0a18, #000);
+  color: #f0e6d2;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-image: url(image/rift.jpg);
+  background-size: cover;
+  text-align: center;
+}
+
+h1 { text-align: center; color: #7b6ec8; font-size: 3.2em; margin: 30px auto; }
+h2 { text-align: center; color: #c8aa6e; font-size: 1.4em; }
+
+.main-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  padding: 20px;
+  flex: 1;
+}
+
+/* === Colonne gauche === */
+#left-column {
+  background: rgba(20,20,35,0.8);
+  border: 2px solid #c8aa6e;
+  border-radius: 15px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 2px solid #c8aa6e;
+  background: #1e1e2a;
+  color: #f0e6d2;
+  width: 90%;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+}
+
+button {
+  padding: 10px 15px;
+  border: 2px solid #c8aa6e;
+  border-radius: 10px;
+  margin: 5px;
+  background: linear-gradient(45deg,#1a2634,#102030);
+  color: #f0e6d2;
+  font-family: 'Cinzel', serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+button:hover {
+  background: linear-gradient(45deg,#c8aa6e,#785a28);
+  color: black;
+  transform: scale(1.1);
+}
+
+/* === Colonne centrale === */
+#center-column { text-align:center; }
+
+#wheelContainer {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+#wheel {
+  border-radius: 50%;
+  border: 8px solid #c8aa6e;
+  box-shadow: 0 0 30px #c8aa6e, inset 0 0 100px #1a2634;
+  transition: transform 5s cubic-bezier(0.33,1,0.68,1);
+}
+
+#wheel.spinning { animation: glow 1s infinite; }
+@keyframes glow { 0%,100% { box-shadow:0 0 25px #c8aa6e, inset 0 0 100px #1a2634;}50%{box-shadow:0 0 50px #fff, inset 0 0 120px #c8aa6e;} }
+
+#pointer {
+  position:absolute;
+  top:3px;
+  left:50%;
+  transform: translateX(-50%) rotate(180deg);
+  width:0;height:0;
+  border-left:8px solid transparent;
+  border-right:8px solid transparent;
+  border-bottom:35px solid #c8aa6e;
+  z-index:8;
+}
+
+#winner {
+  margin-top:20px;
+  font-size:2.4em;
+  font-weight:900;
+  color:#ffd700;
+  text-shadow:0 0 15px #ffae00,0 0 40px #ff8000;
+  display:none;
+}
+
+.controls { text-align:center; margin-bottom:10px; }
+
+select {
+  padding:8px;
+  border-radius:6px;
+  background:#1a2634;
+  color:#f0e6d2;
+  border:2px solid #c8aa6e;
+  font-family:'Cinzel', serif;
+}
+
+/* === Colonne droite === */
+#right-column {
+  background: rgba(20,20,35,0.8);
+  border: 2px solid #c8aa6e;
+  border-radius: 15px;
+  padding:15px;
+}
+
+.players-header {
+  display:grid;
+  grid-template-columns: 60% 25% 15%;
+  font-weight:bold;
+  color:#c8aa6e;
+  padding-bottom:5px;
+  border-bottom:1px solid rgba(200,170,110,0.5);
+  text-align:center;
+  font-size:1.1em;
+}
+
+.player {
+  display:grid;
+  grid-template-columns:60% 25% 15%;
+  align-items:center;
+  margin:8px 0;
+  padding:8px;
+  background: rgba(40,40,60,0.6);
+  border-radius:8px;
+}
+
+.player-name {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-right:10px;
+}
+
+.player-controls button { padding:4px 9px; margin:0 2px; font-size:0.9em; }
+.player input[type="checkbox"] { transform: scale(1.4); margin:auto; }
+
+#ranking {
+  margin-top:15px;
+  padding-top:10px;
+  border-top:2px solid #c8aa6e;
+}
+
+#ranking h3 { text-align:center; color:#c8aa6e; font-size:1.3em; margin-bottom:10px;}
+.ranking-item { display:flex; justify-content:space-between; padding:6px 10px; border-bottom:1px solid rgba(200,170,110,0.3);}
+</style>
+</head>
+<body>
+
+<h1>⚔️ SNR Roulette FX ⚔️</h1>
+
+<div class="main-container">
+  <!-- Gauche -->
+  <div id="left-column">
+    <h2>Participants</h2>
+    <div class="input-container" id="inputs"></div>
+    <button id="addBtn">➕ Ajouter un participant</button>
+  </div>
+
+  <!-- Centre -->
+  <div id="center-column">
+    <div id="wheelContainer">
+      <div id="pointer"></div>
+      <canvas id="wheel" width="400" height="400"></canvas>
+    </div>
+    <div class="controls">
+      <button id="spinBtn">Lancer</button>
+      <button id="relaunchBtn">Relancer sans gagnant</button><br>
+      <select id="boostSelect"></select>
+      <button id="boostBtn">Chance +</button>
+      <button id="reduceBtn">Chance -</button><br>
+      <button id="resetBtn">🔄 RESET TOTAL</button>
+    </div>
+    <p id="winner"></p>
+  </div>
+
+  <!-- Droite -->
+  <div id="right-column">
+    <h2>Joueurs</h2>
+    <div class="players-header">
+      <span>Joueur</span>
+      <span>Points</span>
+      <span>Perdant</span>
+    </div>
+    <div id="playersList"></div>
+
+    <!-- Bouton Valider -->
+    <button id="validateBtn">✅ Valider les points</button>
+
+    <div id="ranking">
+      <h3>Classement</h3>
+      <div id="rankingList"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import confetti from 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.module.mjs';
+
+const canvas=document.getElementById("wheel");
+const ctx=canvas.getContext("2d");
+const inputsContainer=document.getElementById("inputs");
+const boostSelect=document.getElementById("boostSelect");
+const playersList=document.getElementById("playersList");
+const rankingList=document.getElementById("rankingList");
+const winnerEl=document.getElementById("winner");
+const validateBtn=document.getElementById("validateBtn");
+const resetBtn=document.getElementById("resetBtn");
+
+let participants=[];
+let players=Array(4).fill(null).map(()=>({name:"", points:0, replace:false}));
+let ranking=[];
+let winner=null;
+let oldTargetAngle=0;
+let totalRotation=0;
+
+// --- LOCALSTORAGE ---
+function saveData() {
+  localStorage.setItem("rouletteData", JSON.stringify({participants, players, ranking}));
+}
+function loadData() {
+  const data=JSON.parse(localStorage.getItem("rouletteData")||"null");
+  if(data){
+    participants=data.participants||[];
+    players=data.players||Array(4).fill(null).map(()=>({name:"", points:0, replace:false}));
+    ranking=data.ranking||[];
+  }
+}
+loadData();
+
+// --- Participants ---
+function addInput(value=""){
+  const input=document.createElement("input");
+  input.placeholder="Participant "+(inputsContainer.children.length+1);
+  input.value=value;
+  input.addEventListener("input", updateParticipants);
+  inputsContainer.appendChild(input);
+  updateParticipants();
+}
+function updateParticipants(){
+  participants=Array.from(inputsContainer.querySelectorAll("input"))
+    .map(el=>el.value.trim())
+    .filter(v=>v)
+    .map(name=>({name, removed:false, weight:1}));
+  refreshBoostList();
+  drawWheel();
+  saveData();
+}
+function removeParticipant(name){
+  participants=participants.filter(p=>p.name!==name);
+  Array.from(inputsContainer.querySelectorAll("input")).forEach(inp=>{
+    if(inp.value===name) inp.remove();
+  });
+  updateParticipants();
+}
+function refreshBoostList(){
+  boostSelect.innerHTML="";
+  participants.forEach(p=>{
+    const opt=document.createElement("option");
+    opt.textContent=p.name;
+    boostSelect.appendChild(opt);
+  });
+}
+
+// --- Joueurs ---
+function renderPlayers(){
+  playersList.innerHTML="";
+  players.forEach((player,i)=>{
+    const div=document.createElement("div");
+    div.className="player";
+    div.innerHTML=`
+      <div class="player-name">
+        <span>${player.name||"— Vide —"}</span>
+        <div class="player-controls">
+          <button onclick="window.addPoints(${i},1)">+</button>
+          <button onclick="window.addPoints(${i},-1)">−</button>
+        </div>
+      </div>
+      <span>${player.points}</span>
+      <input type="checkbox" ${player.replace?"checked":""} onchange="window.toggleReplace(${i})">
+    `;
+    playersList.appendChild(div);
+  });
+  saveData();
+}
+window.addPoints=function(i,delta){players[i].points=Math.max(0,players[i].points+delta); renderPlayers();}
+window.toggleReplace=function(i){players[i].replace=!players[i].replace; saveData();}
+
+// --- Classement ---
+function renderRanking(){
+  rankingList.innerHTML="";
+  ranking.forEach(r=>{
+    const div=document.createElement("div");
+    div.className="ranking-item";
+    div.innerHTML=`<span>${r.name}</span><span>${r.points}</span>`;
+    rankingList.appendChild(div);
+  });
+  saveData();
+}
+
+// --- Valider points ---
+validateBtn.addEventListener("click",()=>{
+  players.forEach((p,i)=>{
+    if(!p.name) return;
+    // Ajouter points au classement
+    let r=ranking.find(r=>r.name===p.name);
+    if(r) r.points+=p.points;
+    else ranking.push({name:p.name, points:p.points});
+    p.points=0;
+    // Si checkbox cochée -> supprimer joueur
+    if(p.replace){
+      players[i]={name:"", points:0, replace:false};
+    }
+  });
+  renderPlayers();
+  renderRanking();
+});
+
+// --- Roulette ---
+function drawWheel(){
+  const active=participants;
+  const radius=canvas.width/2;
+  const totalWeight=active.reduce((sum,p)=>sum+p.weight,0);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  let startAngle=-Math.PI/2;
+  active.forEach((p,i)=>{
+    const slice=2*Math.PI*(p.weight/totalWeight);
+    const endAngle=startAngle+slice;
+    const gradient=ctx.createRadialGradient(radius,radius,50,radius,radius,radius);
+    gradient.addColorStop(0,`hsl(${i*360/active.length},60%,55%)`);
+    gradient.addColorStop(1,`hsl(${i*360/active.length},80%,35%)`);
+    ctx.beginPath();
+    ctx.moveTo(radius,radius);
+    ctx.arc(radius,radius,radius,startAngle,endAngle);
+    ctx.closePath();
+    ctx.fillStyle=gradient;
+    ctx.fill();
+    ctx.save();
+    ctx.translate(radius,radius);
+    ctx.rotate(startAngle+slice/2);
+    ctx.textAlign="right";
+    ctx.fillStyle="#f0e6d2";
+    ctx.font="bold 20px Cinzel";
+    ctx.fillText(p.name,radius-10,5);
+    ctx.restore();
+    startAngle=endAngle;
+  });
+}
+
+function spin(){
+  const active=participants;
+  if(active.length===0) return alert("Aucun participant !");
+  const full=players.every(p=>p.name);
+  const anyReplace=players.some(p=>p.replace);
+  if(full&&!anyReplace) return alert("⚠️ La liste des joueurs est pleine et aucune case n'est cochée !");
+  winnerEl.style.display="none";
+  canvas.classList.add("spinning");
+
+  const totalWeight=active.reduce((sum,p)=>sum+p.weight,0);
+  let rand=Math.random()*totalWeight;
+  let chosen,chosenIndex;
+  for(let i=0;i<active.length;i++){rand-=active[i].weight; if(rand<=0){chosen=active[i]; chosenIndex=i; break;}}
+  const sliceAngles=active.map(p=>(p.weight/totalWeight)*360);
+  let targetAngle=sliceAngles.slice(0,chosenIndex).reduce((a,b)=>a+b,0);
+  targetAngle+=Math.random()*sliceAngles[chosenIndex];
+  const randomSpins=360*(Math.floor(Math.random()*4)+5);
+  totalRotation+=oldTargetAngle+randomSpins+(360-targetAngle);
+  canvas.style.transform=`rotate(${totalRotation}deg)`;
+  oldTargetAngle=targetAngle;
+
+  setTimeout(()=>{
+    canvas.classList.remove("spinning");
+    winner=chosen;
+    winnerEl.textContent=`🏆 ${winner.name} 🏆`;
+    winnerEl.style.display="block";
+    confetti({particleCount:250,spread:120,origin:{y:0.6}});
+    assignWinner(winner.name);
+    removeParticipant(winner.name);
+  },5000);
+}
+
+function assignWinner(name){
+  const empty=players.findIndex(p=>!p.name);
+  const replaceIndex=players.findIndex(p=>p.replace);
+  let idx=replaceIndex!==-1?replaceIndex:empty;
+  if(idx!==-1) players[idx]={name, points:0, replace:false};
+  let r=ranking.find(r=>r.name===name);
+  if(!r) ranking.push({name, points:0});
+  renderPlayers();
+}
+
+function relaunchWithoutWinner(){
+  if(!winner) return alert("Lancez d'abord la roulette !");
+  winner=null;
+  drawWheel();
+  refreshBoostList();
+  setTimeout(()=>spin(),500);
+}
+
+function boostParticipant(){
+  const p=participants.find(p=>p.name===boostSelect.value);
+  if(p){p.weight++; drawWheel();}
+}
+function reduceChance(){
+  const p=participants.find(p=>p.name===boostSelect.value);
+  if(p&&p.weight>1){p.weight--; drawWheel();}
+}
+
+document.getElementById("addBtn").addEventListener("click",()=>addInput());
+document.getElementById("spinBtn").addEventListener("click",spin);
+document.getElementById("relaunchBtn").addEventListener("click",relaunchWithoutWinner);
+document.getElementById("boostBtn").addEventListener("click",boostParticipant);
+document.getElementById("reduceBtn").addEventListener("click",reduceChance);
+
+// --- RESET TOTAL ---
+resetBtn.addEventListener("click",()=>{
+  if(confirm("Voulez-vous vraiment réinitialiser toutes les données ?")){
+    participants=[]; players=Array(4).fill(null).map(()=>({name:"", points:0, replace:false})); ranking=[];
+    inputsContainer.innerHTML="";
+    for(let i=0;i<5;i++) addInput("");
+    renderPlayers(); renderRanking(); drawWheel(); saveData();
+  }
+});
+
+// --- Initialisation ---
+if(participants.length===0){for(let i=0;i<5;i++) addInput("");}
+renderPlayers(); renderRanking();
+drawWheel();
+</script>
+</body>
+</html>
