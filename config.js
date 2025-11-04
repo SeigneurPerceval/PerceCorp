@@ -1,0 +1,2 @@
+export const SUPABASE_URL="https://rjulzaummbtlvxfvctta.supabase.co";
+export const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqdWx6YXVtbWJ0bHZ4ZnZjdHRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxMDE1NDcsImV4cCI6MjA3NzY3NzU0N30.gYTET1uowRNlLIsTd-yp_r-DIJZI_MSYcvJymngKS2g";
